@@ -14,12 +14,12 @@ namespace ParallelProcessing
 {
     internal class Program
     {
+        private static readonly SemaphoreSlim CsvWriteLock = new SemaphoreSlim(1, 1);
+
         static async Task Main(string[] args)
         {
-            const string CsvWriteMutexName = "Global\\CSVWriteFileMutex";
-
             const int BATCH_QUANTITY = 2_500_000;
-            const int ROW_DATA = 12_000_000;
+            const int ROW_DATA = 15_000_000;
             const int BATCH = ROW_DATA % BATCH_QUANTITY == 0 ? ROW_DATA / BATCH_QUANTITY : ROW_DATA / BATCH_QUANTITY + 1;
 
             string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
@@ -43,7 +43,7 @@ namespace ParallelProcessing
                 int index = i;
                 Stopwatch sw = new Stopwatch();
 
-                Task taskRW = Task.Run(() =>
+                Task taskRW = Task.Run(async () =>
                 {
                     int start = index * BATCH_QUANTITY + 1;
 
@@ -56,19 +56,14 @@ namespace ParallelProcessing
 
                     sw.Restart();
 
-                    using (Mutex mutex = new Mutex(false, CsvWriteMutexName))
+                    await CsvWriteLock.WaitAsync();
+                    try
                     {
-                        try
-                        {
-                            if (mutex.WaitOne())
-                            {
-                                CSVHelper.WriteList(writePath, record_list, true);
-                            }
-                        }
-                        finally
-                        {
-                            mutex.ReleaseMutex();
-                        }
+                        CSVHelper.WriteList(writePath, record_list, true);
+                    }
+                    finally
+                    {
+                        CsvWriteLock.Release();
                     }
 
                     sw.Stop();
