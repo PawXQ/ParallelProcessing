@@ -16,10 +16,10 @@ namespace ParallelProcessing
     {
         static async Task Main(string[] args)
         {
-            object key = new object();
+            const string CsvWriteMutexName = "Global\\CSVWriteFileMutex";
 
             const int BATCH_QUANTITY = 2_500_000;
-            const int ROW_DATA = 13_000_000;
+            const int ROW_DATA = 12_000_000;
             const int BATCH = ROW_DATA % BATCH_QUANTITY == 0 ? ROW_DATA / BATCH_QUANTITY : ROW_DATA / BATCH_QUANTITY + 1;
 
             string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
@@ -55,10 +55,22 @@ namespace ParallelProcessing
                     Console.WriteLine($"Batch{index + 1} read: {swRead}");
 
                     sw.Restart();
-                    lock (key)
+
+                    using (Mutex mutex = new Mutex(false, CsvWriteMutexName))
                     {
-                        CSVHelper.WriteList(writePath, record_list, true);
+                        try
+                        {
+                            if (mutex.WaitOne())
+                            {
+                                CSVHelper.WriteList(writePath, record_list, true);
+                            }
+                        }
+                        finally
+                        {
+                            mutex.ReleaseMutex();
+                        }
                     }
+
                     sw.Stop();
                     double swWrite = sw.ElapsedMilliseconds / 1000.0;
                     writeTimes.Add(swWrite);
