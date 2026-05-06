@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="CSVLibrary">
+      <HintPath>..\..\CSVLibrary\CSVLibrary\bin\Debug\CSVLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="CSV_Library">
+      <HintPath>..\..\..\..\..\..\..\..\Downloads\CSV_Library-master\CSV_Library-master\CSV_Library\bin\Debug\CSV_Library.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
