@@ -1,4 +1,5 @@
 ﻿using CSVLibrary;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,12 +20,19 @@ namespace ParallelProcessing
         static async Task Main(string[] args)
         {
             const int BATCH_QUANTITY = 2_500_000;
-            const int ROW_DATA = 15_000_000;
+            const int ROW_DATA = 9_000_000;
             const int BATCH = ROW_DATA % BATCH_QUANTITY == 0 ? ROW_DATA / BATCH_QUANTITY : ROW_DATA / BATCH_QUANTITY + 1;
 
             string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
             string readPath = Path.Combine(path, $@"ReadData\{ROW_DATA}_MOCK_DATA.csv");
             string writePath = Path.Combine(path, $@"WriteData\{ROW_DATA}_MOCK_DATA.csv");
+
+            // MpdIndex
+            string mpdJsonPath = Path.Combine(path, $@"ReadData\{ROW_DATA}_MOCK_DATA.json");
+            string MpdIndexString = File.ReadAllText(mpdJsonPath);
+            List<MpdIndex> mpdIndices = JsonConvert.DeserializeObject<List<MpdIndex>>(MpdIndexString);
+            List<long> mpdIndicesStartRows = mpdIndices.Select(x => x.StartRows).ToList();
+            // MpdIndex
 
             if (File.Exists(writePath))
                 File.Delete(writePath);
@@ -47,8 +55,20 @@ namespace ParallelProcessing
                 {
                     int start = index * BATCH_QUANTITY + 1;
 
+                    // MpdIndex
+                    int MpdIndex = binarySearch(mpdIndicesStartRows, start);
+                    Console.WriteLine($"Batch{index + 1} MpdIndex: {MpdIndex}");
+                    long MpdStartPosition = mpdIndices[MpdIndex].StartPosition;
+                    long MpdStartRow = mpdIndices[MpdIndex].StartRows;
+                    // MpdIndex
+
                     sw.Start();
-                    List<Record> record_list = CSVHelper.Read<Record>(readPath, start, BATCH_QUANTITY);
+                    //List<Record> record_list = CSVHelper.Read<Record>(readPath, start, BATCH_QUANTITY);
+
+                    // MpdIndex
+                    List<Record> record_list = CSVHelper.ReadMpd<Record>(readPath, MpdStartPosition, MpdStartRow, start, BATCH_QUANTITY);
+                    // MpdIndex
+
                     sw.Stop();
                     double swRead = sw.ElapsedMilliseconds / 1000.0;
                     readTimes.Add(swRead);
@@ -91,6 +111,22 @@ namespace ParallelProcessing
             Console.WriteLine($"|  {BATCH_QUANTITY.ToString("#,##0")}     | {ROW_DATA.ToString("#,##0")}     |{Math.Round(readTimes.Median(x => x), 2)}            |     {Math.Round(writeTimes.Median(x => x), 2)}            |     {Math.Round(swTotal.ElapsedMilliseconds / 1000.0, 2)}          |                |");
 
             Console.ReadKey();
+        }
+
+        public static int binarySearch(List<long> ints, int target)
+        {
+            int left = 0;
+            int right = ints.Count - 1;
+
+            while (left <= right)
+            {
+                int mid = (left + right) / 2;
+                if (target == ints[mid]) { return mid; }
+                else if (target < ints[mid]) { right = mid - 1; }
+                else if (target > ints[mid]) { left = mid + 1; }
+            }
+
+            return right;
         }
     }
 }
