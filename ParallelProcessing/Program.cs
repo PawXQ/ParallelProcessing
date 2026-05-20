@@ -20,7 +20,9 @@ namespace ParallelProcessing
         static async Task Main(string[] args)
         {
             const int BATCH_QUANTITY = 2_500_000;
-            const int ROW_DATA = 9_000_000;
+            const int ROW_DATA = 20_000_000;
+            //const int ROW_DATA = 14_000_000;
+            //const int ROW_DATA = 10;
             const int BATCH = ROW_DATA % BATCH_QUANTITY == 0 ? ROW_DATA / BATCH_QUANTITY : ROW_DATA / BATCH_QUANTITY + 1;
 
             string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
@@ -66,7 +68,8 @@ namespace ParallelProcessing
                     //List<Record> record_list = CSVHelper.Read<Record>(readPath, start, BATCH_QUANTITY);
 
                     // MpdIndex
-                    List<Record> record_list = CSVHelper.ReadMpd<Record>(readPath, MpdStartPosition, MpdStartRow, start, BATCH_QUANTITY);
+                    //List<Record> record_list = CSVHelper.ReadMpd<Record>(readPath, MpdStartPosition, MpdStartRow, start, BATCH_QUANTITY);
+                    List<Record> record_list = CSVHelper.OptimizeReadMpd<Record>(readPath, MpdStartPosition, MpdStartRow, start, BATCH_QUANTITY);
                     // MpdIndex
 
                     sw.Stop();
@@ -79,7 +82,8 @@ namespace ParallelProcessing
                     await CsvWriteLock.WaitAsync();
                     try
                     {
-                        CSVHelper.WriteList(writePath, record_list, true);
+                        //CSVHelper.WriteList(writePath, record_list, true);
+                        CSVHelper.OptimizeWriteList(writePath, record_list, true);
                     }
                     finally
                     {

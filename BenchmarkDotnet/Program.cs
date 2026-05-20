@@ -24,7 +24,11 @@ namespace BenchmarkDotnet
         {
             //var summary = BenchmarkRunner.Run<EmptyVSNewList>();
             //var summary = BenchmarkRunner.Run<Count>();
-            var summary = BenchmarkRunner.Run<ReadVSOptimizeRead>();
+            //var summary = BenchmarkRunner.Run<ReadVSOptimizeRead>();
+            //var summary = BenchmarkRunner.Run<WriteVSOptimizeWrite>();
+
+            //WriteVSOptimizeWrite writeVSOptimizeWrite = new WriteVSOptimizeWrite();
+            //writeVSOptimizeWrite.OptimizeWrite();
 
 
             // binarySearch
@@ -35,16 +39,16 @@ namespace BenchmarkDotnet
             // binarySearch
 
 
-            //// buildMpdIndex
-            //const int ROW_DATA = 9_000_000;
-            //const int BYTE_TARGET = 1_000_000;
+            // buildMpdIndex
+            const int ROW_DATA = 7_500_000;
+            const int BYTE_TARGET = 1_000_000;
 
-            //string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
-            //string readPath = Path.Combine(path, $@"ReadData\{ROW_DATA}_MOCK_DATA.csv");
-            //string mpdJsonPath = Path.Combine(path, $@"ReadData\{ROW_DATA}_MOCK_DATA.json");
+            string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
+            string readPath = Path.Combine(path, $@"ReadData\{ROW_DATA}_MOCK_DATA.csv");
+            string mpdJsonPath = Path.Combine(path, $@"ReadData\{ROW_DATA}_MOCK_DATA.json");
 
-            //BuildIndex(readPath, mpdJsonPath, BYTE_TARGET);
-            //// buildMpdIndex
+            BuildIndex(readPath, mpdJsonPath, BYTE_TARGET);
+            // buildMpdIndex
 
 
 

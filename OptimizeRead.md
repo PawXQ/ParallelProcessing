@@ -168,6 +168,11 @@ public void OptimizeRead()
 
 ### 優化項目 1-4(Read): 單純使用 Split & Span & Reflection & Static & `Delegate`
 
+| Method       |     Mean |    Error |   StdDev |   Median |   Gen0 | Allocated |
+| ------------ | -------: | -------: | -------: | -------: | -----: | --------: |
+| Read         | 954.5 ns | 12.62 ns | 11.18 ns | 955.0 ns | 0.1583 |     837 B |
+| OptimizeRead | 228.1 ns | 16.59 ns | 48.91 ns | 251.8 ns | 0.0212 |     112 B |
+
 ```C#
 public static string record = "19,Winonah,Ashtonhurst,washtonhursti@people.com.cn,Female,68.161.193.249";
 public static int startIndex = 0;

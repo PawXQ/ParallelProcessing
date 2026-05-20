@@ -58,6 +58,29 @@ namespace BenchmarkDotnet
         }
 
         [Benchmark]
+        public void OptimizeRead_Fixed()
+        {
+            string data = "19,Winonah,Ashtonhurst,washtonhursti@people.com.cn,Female,68.161.193.249";
+            string[] strings = new string[6];
+            ReadOnlySpan<char> span = data.AsSpan();
+
+            int index = 0;
+            while (true)
+            {
+                // 使用 Span.IndexOf 尋找「字元 (char)」，這會觸發極快的硬體加速指令
+                int commaPos = span.IndexOf(',');
+                if (commaPos == -1)
+                {
+                    strings[index] = span.ToString(); // 最後一個片段
+                    break;
+                }
+
+                strings[index++] = span.Slice(0, commaPos).ToString();
+                span = span.Slice(commaPos + 1); // 縮小 Span 的視圖範圍
+            }
+        }
+
+        [Benchmark]
         public void OptimizeRead()
         {
             //for (int j = 0; j < 2_500_000; j++)
