@@ -4,11 +4,12 @@ using CSVLibrary;
 using Newtonsoft.Json;
 using ParallelPractice;
 using System.Diagnostics;
+using System.IO.MemoryMappedFiles;
 
 object obj = new object();
 
 const int BATCH_QUANTITY = 2_500_000;
-const int ROW_DATA = 35_000_000;
+const int ROW_DATA = 30_000_000;
 //const int ROW_DATA = 10;
 const int BATCH = ROW_DATA % BATCH_QUANTITY == 0 ? ROW_DATA / BATCH_QUANTITY : ROW_DATA / BATCH_QUANTITY + 1;
 
@@ -42,19 +43,21 @@ await Parallel.ForAsync(0, BATCH, (number, token) =>
 
     int start = index * BATCH_QUANTITY + 1;
 
-    // MpdIndex
-    int MpdIndex = binarySearch(mpdIndicesStartRows, start);
-    Console.WriteLine($"Batch{index + 1} MpdIndex: {MpdIndex}");
-    long MpdStartPosition = mpdIndices[MpdIndex].StartPosition;
-    long MpdStartRow = mpdIndices[MpdIndex].StartRows;
-    // MpdIndex
+    //// MpdIndex
+    //int MpdIndex = binarySearch(mpdIndicesStartRows, start);
+    //Console.WriteLine($"Batch{index + 1} MpdIndex: {MpdIndex}");
+    //long MpdStartPosition = mpdIndices[MpdIndex].StartPosition;
+    //long MpdStartRow = mpdIndices[MpdIndex].StartRows;
+    //// MpdIndex
 
     sw.Start();
     List<Record> record_list = CSVHelper.Read<Record>(readPath, start, BATCH_QUANTITY);
+    //List<Record> record_list = CSVHelper.OptimizeRead<Record>(readPath, start, BATCH_QUANTITY);
 
     // MpdIndex
     //List<Record> record_list = CSVHelper.ReadMpd<Record>(readPath, MpdStartPosition, MpdStartRow, start, BATCH_QUANTITY);
     //List<Record> record_list = CSVHelper.OptimizeReadMpd<Record>(readPath, MpdStartPosition, MpdStartRow, start, BATCH_QUANTITY);
+
     // MpdIndex
 
     sw.Stop();
@@ -66,15 +69,15 @@ await Parallel.ForAsync(0, BATCH, (number, token) =>
     lock (obj)
     {
         //CSVHelper.WriteList(writePath, record_list, true);
-        //CSVHelper.OptimizeWriteList(writePath, record_list, true);
+        CSVHelper.OptimizeWriteList(writePath, record_list, true);
     }
 
     sw.Stop();
     double swWrite = sw.ElapsedMilliseconds / 1000.0;
     writeTimes.Add(swWrite);
-    //Console.WriteLine($"Batch{index + 1} write: {swWrite}");
+    Console.WriteLine($"Batch{index + 1} write: {swWrite}");
 
-    //Console.WriteLine($"Batch{index + 1} total: {swRead + swWrite}");
+    Console.WriteLine($"Batch{index + 1} total: {swRead + swWrite}");
 
     return ValueTask.CompletedTask;
 });
