@@ -9,7 +9,7 @@ using System.IO.MemoryMappedFiles;
 object obj = new object();
 
 const int BATCH_QUANTITY = 2_500_000;
-const int ROW_DATA = 30_000_000;
+const int ROW_DATA = 85_000_000;
 //const int ROW_DATA = 10;
 const int BATCH = ROW_DATA % BATCH_QUANTITY == 0 ? ROW_DATA / BATCH_QUANTITY : ROW_DATA / BATCH_QUANTITY + 1;
 
@@ -44,10 +44,10 @@ await Parallel.ForAsync(0, BATCH, (number, token) =>
     int start = index * BATCH_QUANTITY + 1;
 
     //// MpdIndex
-    //int MpdIndex = binarySearch(mpdIndicesStartRows, start);
-    //Console.WriteLine($"Batch{index + 1} MpdIndex: {MpdIndex}");
-    //long MpdStartPosition = mpdIndices[MpdIndex].StartPosition;
-    //long MpdStartRow = mpdIndices[MpdIndex].StartRows;
+    int MpdIndex = binarySearch(mpdIndicesStartRows, start);
+    Console.WriteLine($"Batch{index + 1} MpdIndex: {MpdIndex}");
+    long MpdStartPosition = mpdIndices[MpdIndex].StartPosition;
+    long MpdStartRow = mpdIndices[MpdIndex].StartRows;
     //// MpdIndex
 
     sw.Start();
@@ -68,8 +68,8 @@ await Parallel.ForAsync(0, BATCH, (number, token) =>
     sw.Restart();
     lock (obj)
     {
-        //CSVHelper.WriteList(writePath, record_list, true);
-        CSVHelper.OptimizeWriteList(writePath, record_list, true);
+        CSVHelper.WriteList(writePath, record_list, true);
+        //CSVHelper.OptimizeWriteList(writePath, record_list, true);
     }
 
     sw.Stop();

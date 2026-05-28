@@ -40,7 +40,7 @@ namespace BenchmarkDotnet
 
 
             // buildMpdIndex
-            const int ROW_DATA = 7_500_000;
+            const int ROW_DATA = 100_000_000;
             const int BYTE_TARGET = 1_000_000;
 
             string path = @"C:\Users\Albert\Github\repos\private\c_sharp\leo_class\console\ParallelProcessingData";
